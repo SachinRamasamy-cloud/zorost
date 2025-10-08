@@ -5,7 +5,7 @@ import Hcards from './pages/Hcards'
 import Detail from './pages/Detail'
 import Add from './pages/Add'
 import React, { useState, useEffect } from 'react'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import Topcat from './pages/Topcat'
 import Acard from './pages/Acard'
 import Hhcard from './pages/Hhcard'
@@ -63,7 +63,7 @@ function App() {
       <div className="mt-8"></div>
       <Routes>
         <Route
-          path="/"
+          path="/home"
           element={
             <>
               <Hero />
@@ -77,6 +77,8 @@ function App() {
             </>
           }
         />
+
+        <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="/add" element={<Add addProduct={addProduct} />} />
 
         {/* Edit route */}

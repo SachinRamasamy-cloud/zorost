@@ -6,7 +6,7 @@ export default function Nave() {
         <>
             <div className="sm:hidden fixed bottom-0 left-0 w-full bg-black/70 backdrop-blur-md border-t border-gray-700 flex justify-around items-center py-3 z-50 text-gray-200">
 
-                <Link to="/" className="flex flex-col items-center cursor-pointer hover:text-purple-400 transition-colors">
+                <Link to="/home" className="flex flex-col items-center cursor-pointer hover:text-purple-400 transition-colors">
                     <i className="fa-solid fa-house"></i>
                     <span className="text-xs mt-1">Home</span>
                 </Link>
