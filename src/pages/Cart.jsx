@@ -30,7 +30,6 @@ export default function Cart() {
     const updatedCart = cart.filter((item) => item.id !== id);
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
     if (user) {
       alert(`Product will be delivered to ${user.loc}`);
     }
@@ -48,7 +47,6 @@ export default function Cart() {
               key={`local-${p.id}`}
               className="relative cursor-pointer flex-shrink-0 w-72 md:w-auto rounded-2xl overflow-hidden backdrop-blur-md bg-white/20 border border-white/30 shadow-lg hover:scale-105 transition-transform duration-500 group"
             >
-              {/* Image */}
               <div className="relative overflow-hidden">
                 <img
                   className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500"
@@ -61,7 +59,6 @@ export default function Cart() {
 
               </div>
 
-              {/* Card Content */}
               <div className="relative p-3 text-white relative z-10">
                 <h2 className="text-[20px] font-bold drop-shadow-md">{p.name}</h2>
                 <p className="font-semibold text-base drop-shadow-md">₹ {p.price}</p>

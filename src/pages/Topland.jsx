@@ -1,111 +1,76 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import defaultProducts from './data';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getproduct } from '../server/allAPI';
 
-export default function Topland({ products = [] }) {
-    const category = "Fashion";
+export default function Hcards() {
     const navigate = useNavigate();
+    const [product, setProduct] = useState([]); // initialize as empty array
 
-    const filteredDefault = defaultProducts.filter(
-        (item) => item.category.toLowerCase() === category.toLowerCase()
-    );
-    const filteredLocal = products.filter(
-        (item) => item.category.toLowerCase() === category.toLowerCase()
-    );
+    const getpro = async () => {
+        try {
+            const result = await getproduct();
+            setProduct(result);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
-    const handleCardClick = (id) => navigate(`/detail/${id}`);
-    const handleCardClick2 = (id) => navigate(`/adetail/${id}`);
+    useEffect(() => {
+        getpro(); // call the function directly
+    }, []);
+
+    const filterpro=product.filter(p=>p.category.toLowerCase()==="fashion")
+    const handleCardClick = (id) => {
+        navigate(`/adetail/${id}`);
+    };
 
     return (
-        <div className="px-4">
-            <h1 className="text-3xl font-semibold ml-2 my-4"
-            style={{ fontFamily: "'Poppins', 'sans-serif'"}}>Top {category}</h1>
+        <div className="my-6">
+            <h1
+                className="px-4 text-3xl font-semibold"
+                style={{ fontFamily: "'Poppins', 'sans-serif'" }}
+            >
+                Top Fashion
+            </h1>
+            <div className="px-5 md:grid md:grid-cols-4 gap-4 overflow-x-auto md:overflow-visible flex md:flex-none space-x-4 md:space-x-0 my-4">
+                {filterpro
+                    .sort(() => 0.8 - Math.random())
+                    .slice(0, 8)
+                    .map((p) => (
+                        <div
+                            key={`local-${p.id}`}
+                            onClick={() => handleCardClick(p.id)}
+                            className="relative cursor-pointer flex-shrink-0 w-72 md:w-auto rounded-2xl overflow-hidden backdrop-blur-md bg-white/20 border border-white/30 shadow-lg hover:scale-105 transition-transform duration-500 group"
+                        >
+                            {/* Image */}
+                            <div className="relative overflow-hidden">
+                                <img
+                                    className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500"
+                                    src={p.image}
+                                    alt={p.name}
+                                />
+                                <span className="absolute top-2 right-2 px-2 py-0.5 text-xs font-medium rounded-full bg-purple-600/70 text-white backdrop-blur-sm shadow">
+                                    {p.category}
+                                </span>
+                            </div>
 
-            <div className="px-1 md:grid md:grid-cols-4 gap-4 overflow-x-auto md:overflow-visible flex md:flex-none space-x-4 md:space-x-0 my-4">
-                {/* LocalStorage / Added products cards */}
-                {filteredLocal.slice(0, 4).map((p) => (
-                    <div
-                        key={`local-${p.id}`}
-                        onClick={() => handleCardClick(p.id)}
-                        className="relative cursor-pointer flex-shrink-0 w-72 md:w-auto rounded-2xl overflow-hidden backdrop-blur-md bg-white/20 border border-white/30 shadow-lg hover:scale-105 transition-transform duration-500 group"
-                    >
-                        {/* Image */}
-                        <div className="relative overflow-hidden">
-                            <img
-                                className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500"
-                                src={p.image}
-                                alt={p.name}
-                            />
-                            <span className="absolute top-2 right-2 px-2 py-0.5 text-xs font-medium rounded-full bg-purple-600/70 text-white backdrop-blur-sm shadow">
-                                {p.category}
-                            </span>
+                            {/* Card Content */}
+                            <div className="relative p-3 text-white z-10">
+                                <h2 className="text-[20px] font-bold drop-shadow-md">{p.name}</h2>
+                                <p className="font-semibold text-base drop-shadow-md">₹ {p.price}</p>
+                                <p className="text-xs text-gray-200 mt-[4px]">
+                                    <i className="fa-solid fa-location-dot"></i> {p.location}
+                                </p>
+                            </div>
 
+                            {/* Hover Blur Overlay */}
+                            <div className="absolute inset-0 bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center">
+                                <p className="text-white font-semibold text-lg flex items-center gap-2">
+                                    <i className="fa-solid fa-eye"></i> View Details
+                                </p>
+                            </div>
                         </div>
-
-                        {/* Card Content */}
-                        <div className="relative p-3 text-white relative z-10">
-                            <h2 className="text-[20px] font-bold drop-shadow-md">{p.name}</h2>
-                            <p className="font-semibold text-base drop-shadow-md">₹ {p.price}</p>
-                            <p className="text-xs text-gray-200 mt-[4px]">
-                                <i className="fa-solid fa-location-dot"></i> {p.location}
-                            </p>
-                        </div>
-
-                        {/* Hover Blur Overlay */}
-                        <div className="absolute inset-0 bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center">
-                            <p className="text-white font-semibold text-lg flex items-center gap-2">
-                                <i className="fa-solid fa-eye"></i> {/* 👈 Font Awesome icon */}
-                                View Details
-                            </p>
-                        </div>
-                    </div>
-                ))}
-
-                {/* Static array cards */}
-                {filteredDefault.sort(() => Math.random() - 0.5).slice(0, 4).map((p) => (
-                    <div
-                        key={`default-${p.id}`}
-                        onClick={() => handleCardClick2(p.id)}
-                        className="relative cursor-pointer flex-shrink-0 w-72 md:w-auto rounded-2xl overflow-hidden backdrop-blur-md bg-white/20 border border-white/30 shadow-lg hover:scale-105 transition-transform duration-500 group"
-                    >
-                        {/* Image */}
-                        <div className="relative overflow-hidden">
-                            <img
-                                className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500"
-                                src={p.image}
-                                alt={p.name}
-                            />
-                            <span className="absolute top-2 right-2 px-2 py-0.5 text-xs font-medium rounded-full bg-purple-600/70 text-white backdrop-blur-sm shadow">
-                                {p.category}
-                            </span>
-
-                        </div>
-
-                        {/* Card Content */}
-                        <div className="relative p-3 text-white relative z-10">
-                            <h2 className="text-[20px] font-bold drop-shadow-md">{p.name}</h2>
-                            <p className="font-semibold text-base drop-shadow-md">₹ {p.price}</p>
-                            <p className="text-xs text-gray-200 mt-[4px]">
-                                <i className="fa-solid fa-location-dot"></i> {p.location}
-                            </p>
-                        </div>
-
-                        {/* Hover Blur Overlay */}
-                        <div className="absolute inset-0 bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center">
-                            <p className="text-white font-semibold text-lg flex items-center gap-2">
-                                <i className="fa-solid fa-eye"></i> {/* 👈 Font Awesome icon */}
-                                View Details
-                            </p>
-                        </div>
-                    </div>
-                ))}
-
-                {/* Show message if no products */}
-                {filteredDefault.length === 0 && filteredLocal.length === 0 && (
-                    <p className="text-white text-center col-span-full">
-                        No products found in "{category}"
-                    </p>
-                )}
+                    ))}
             </div>
         </div>
     );

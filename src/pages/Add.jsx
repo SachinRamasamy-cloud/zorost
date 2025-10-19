@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { addproduct, updproduct, getproductid } from "../server/allAPI";
 
-export default function Add({ addProduct, editProduct, products = [] }) {
+export default function Add() {
   const navigate = useNavigate();
-  const { id } = useParams(); // For edit mode
+  const { id } = useParams(); // edit mode
   const [form, setForm] = useState({
     name: "",
     price: "",
@@ -14,38 +15,43 @@ export default function Add({ addProduct, editProduct, products = [] }) {
   });
 
   const categories = [
-    "Cars",
-    "Mobiles",
-    "Fashion",
-    "Electronics",
-    "Houses",
-    "Furniture",
-    "Pets",
-    "Books",
-    "Sports",
-    "LandMark"
+    "Cars", "Mobiles", "Fashion", "Electronics", "Houses", 
+    "Furniture", "Pets", "Books", "Sports", "LandMark"
   ];
 
-  // Pre-fill form if editing
+  // prefill form if editing
   useEffect(() => {
     if (id) {
-      const existingProduct = products.find((p) => p.id === parseInt(id));
-      if (existingProduct) setForm(existingProduct);
+      const fetchProduct = async () => {
+        try {
+          const data = await getproductid(id);
+          if (data) setForm(data);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+      fetchProduct();
     }
-  }, [id, products]);
+  }, [id]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.price || !form.category) {
       return alert("Name, Price, and Category are required");
     }
 
-    if (id) {
-      editProduct(parseInt(id), form);
+    try {
+      if (id) {
+        await updproduct(id, form);
+        alert("Product updated successfully!");
+      } else {
+        await addproduct(form);
+        alert("Product added successfully!");
+      }
       navigate("/Myproduct");
-    } else {
-      const newId = addProduct(form);
-      navigate(`/detail/${newId}`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save product.");
     }
   };
 
@@ -59,7 +65,6 @@ export default function Add({ addProduct, editProduct, products = [] }) {
           {id ? "Edit Product" : "Add New Product"}
         </h2>
 
-        {/* Name & Price */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <input
             type="text"
@@ -77,7 +82,6 @@ export default function Add({ addProduct, editProduct, products = [] }) {
           />
         </div>
 
-        {/* Image & Location */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <input
             type="text"
@@ -95,7 +99,6 @@ export default function Add({ addProduct, editProduct, products = [] }) {
           />
         </div>
 
-        {/* Category */}
         <select
           value={form.category}
           onChange={(e) => setForm({ ...form, category: e.target.value })}
@@ -104,13 +107,10 @@ export default function Add({ addProduct, editProduct, products = [] }) {
         >
           <option value="" className="text-gray-400">Select Category</option>
           {categories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
+            <option key={cat} value={cat}>{cat}</option>
           ))}
         </select>
 
-        {/* Details Field */}
         <textarea
           placeholder="Add product details..."
           value={form.details}
@@ -118,7 +118,6 @@ export default function Add({ addProduct, editProduct, products = [] }) {
           className="w-full p-3 mb-6 rounded-lg bg-white/20 backdrop-blur-sm border border-white/30 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-white h-28 resize-none"
         />
 
-        {/* Submit Button */}
         <button
           type="submit"
           className="w-full py-3 bg-purple-600 hover:bg-purple-700 rounded-xl text-white font-semibold shadow-lg transition-all duration-300"

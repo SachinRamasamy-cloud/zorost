@@ -1,19 +1,44 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import cards from './data';
+import { getproductid, getproduct } from "../server/allAPI";
 
 export default function Detail() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const [product, setProduct] = useState(null);
+    const [allProducts, setAllProducts] = useState([]);
 
-    // Find the selected product
-    const product = cards.find((p) => p.id.toString() === id);
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                const data = await getproductid(id); // single product
+                setProduct(data);
+            } catch (err) {
+                console.error("Product fetch error:", err);
+            }
+        };
+
+        const fetchAll = async () => {
+            try {
+                const data = await getproduct(); // all products for related
+                setAllProducts(data);
+            } catch (err) {
+                console.error("All products fetch error:", err);
+            }
+        };
+
+        fetchProduct();
+        fetchAll();
+    }, [id]);
 
     if (!product) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
                 <p className="text-center text-red-400 text-2xl font-semibold animate-pulse">
-                    Product not found. <button onClick={() => navigate(-1)} className="underline hover:text-red-300">Go Back</button>
+                    Product not found.{" "}
+                    <button onClick={() => navigate(-1)} className="underline hover:text-red-300">
+                        Go Back
+                    </button>
                 </p>
             </div>
         );
@@ -21,28 +46,22 @@ export default function Detail() {
 
     const handleCardClick = (id) => navigate(`/adetail/${id}`);
 
-    const related = cards.filter(
-        (p) => p.category === product.category && p.id !== product.id
+    // Filter related products
+    const related = allProducts.filter(
+        (p) => p.category.toLowerCase() === product.category.toLowerCase() && p.id !== product.id
     );
+
     const addToCart = (product) => {
-        // Get existing cart or empty array
         const cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-        // Check if product already exists
-        const exists = cart.find((item) => item.id === product.id);
-
-        if (exists) {
+        if (cart.find((item) => item.id === product.id)) {
             alert("Product already in cart!");
         } else {
             cart.push(product);
-            localStorage.setItem("cart", JSON.stringify(cart)); // ✅ Save properly
-            alert(`${product.name} added to cart!`);
             localStorage.setItem("cart", JSON.stringify(cart));
+            alert(`${product.name} added to cart!`);
             window.dispatchEvent(new Event("storage"));
-
         }
     };
-
     return (
         <div className="min-h-screen text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
